@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a2818">
+<title>JMKCC Study - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--g-bg:#0b1410;--g-darker:#041a10;--text:#e9edef;--dim:#8696a0;--ease:cubic-bezier(0.4,0,0.2,1);--bounce:cubic-bezier(0.68,-0.55,0.265,1.55);}
+html,body{height:100%;overflow:hidden;margin:0;}
+body{font-family:'Poppins',sans-serif;background:var(--g-darker);height:100dvh;display:flex;justify-content:center;color:var(--text);-webkit-font-smoothing:antialiased;}
+.app-container{width:100%;max-width:520px;height:100dvh;background:var(--g-bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,0.5);}
+
+#blockedScreen{position:fixed;inset:0;background:linear-gradient(135deg,#7f1d1d,#991b1b);z-index:999999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;}
+#blockedScreen.show{display:flex;}
+#blockedScreen i{font-size:90px;color:#fff;margin-bottom:24px;}
+#blockedScreen h1{font-size:28px;font-weight:900;margin-bottom:12px;color:#fff;}
+#blockedScreen p{font-size:14px;color:#fecaca;line-height:1.6;max-width:300px;}
+#blockedScreen .contact-btn{margin-top:24px;background:#fff;color:#991b1b;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:10px;box-shadow:0 6px 0 #7f1d1d;}
+#unblockStatus{margin-top:18px;font-size:12px;color:#fecaca;font-weight:600;min-height:18px;}
+
+#authScreen{position:absolute;inset:0;z-index:9999;background:linear-gradient(160deg,#041a10 0%,#0a2818 50%,#041a10 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;color:#fff;overflow-y:auto;}
+.auth-logo{width:100px;height:100px;border-radius:28px;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:22px;box-shadow:0 0 0 8px rgba(34,197,94,0.1),0 20px 40px rgba(34,197,94,0.4);animation:floatIn 0.6s var(--ease);}
+@keyframes floatIn{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+#authScreen h1{font-size:28px;font-weight:900;margin-bottom:6px;background:linear-gradient(135deg,#fff,#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+#authScreen .sub{font-size:13px;color:#86efac;margin-bottom:30px;font-weight:500;}
+.auth-input{width:100%;max-width:340px;height:56px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(34,197,94,0.3);border-radius:16px;padding:0 18px;color:#fff;font-size:15px;font-family:inherit;font-weight:600;margin-bottom:12px;outline:none;transition:all 0.2s var(--ease);}
+.auth-input:focus{border-color:#22c55e;background:rgba(34,197,94,0.12);box-shadow:0 0 0 4px rgba(34,197,94,0.15);}
+.auth-input::placeholder{color:rgba(134,239,172,0.5);}
+.auth-btn{width:100%;max-width:340px;height:58px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:16px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:10px;font-family:inherit;box-shadow:0 6px 0 #0a2818,0 10px 25px rgba(34,197,94,0.4);transition:transform 0.1s var(--ease);display:flex;align-items:center;justify-content:center;gap:8px;}
+.auth-btn:active{transform:translateY(6px);box-shadow:0 0 0 #0a2818;}
+.forgot-link{width:100%;max-width:340px;margin-top:16px;text-align:center;}
+.forgot-link button{background:transparent;border:none;color:#86efac;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;padding:10px;text-decoration:underline;text-underline-offset:3px;}
+
+/* ═══ REGISTRATION WAITING SCREEN (NEW) ═══ */
+#regWaitingScreen{position:fixed;inset:0;z-index:999998;background:linear-gradient(160deg,#041a10 0%,#0a2818 50%,#041a10 100%);display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px;color:#fff;text-align:center;overflow-y:auto;}
+#regWaitingScreen.show{display:flex;}
+.reg-shield{width:100px;height:100px;border-radius:28px;background:linear-gradient(135deg,#fbbf24,#d97706);display:flex;align-items:center;justify-content:center;font-size:44px;color:#0a2818;margin-bottom:22px;box-shadow:0 0 0 8px rgba(251,191,36,0.15),0 20px 40px rgba(251,191,36,0.4);animation:regPulse 2s infinite;}
+@keyframes regPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+#regWaitingScreen h2{font-size:24px;font-weight:900;color:#fff;margin-bottom:10px;}
+#regWaitingScreen p{font-size:14px;color:#86efac;line-height:1.6;max-width:320px;font-weight:500;margin-bottom:6px;}
+#regWaitingScreen .reg-info{background:rgba(251,191,36,0.1);border:1.5px solid rgba(251,191,36,0.35);border-radius:14px;padding:16px 20px;margin-top:24px;max-width:320px;text-align:center;}
+#regWaitingScreen .reg-info strong{color:#fbbf24;font-weight:800;font-size:13px;display:block;margin-bottom:6px;}
+#regWaitingScreen .reg-info span{color:#8696a0;font-size:12px;font-weight:500;}
+#regWaitingScreen .reg-timer{margin-top:18px;font-size:12px;color:#8696a0;font-weight:600;}
+#regWaitingScreen .reg-cancel{margin-top:28px;background:rgba(239,68,68,0.15);border:1.5px solid rgba(239,68,68,0.4);color:#fca5a5;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;}
+.reg-spinner{width:60px;height:60px;border-radius:50%;border:5px solid rgba(34,197,94,0.15);border-top-color:#22c55e;animation:spin 1s linear infinite;margin-bottom:20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#subOverlay{position:fixed;inset:0;z-index:99998;background:linear-gradient(160deg,#041a10 0%,#0a2818 50%,#041a10 100%);display:none;flex-direction:column;overflow-y:auto;padding:20px;}
+#subOverlay.show{display:flex;}
+#subCloseBtn{position:fixed;top:20px;right:20px;z-index:10;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);}
+#subCloseBtn.hidden{display:none;}
+.sub-view{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:100%;padding:10px 0;}
+.sub-view.active{display:flex;animation:fadeIn 0.3s var(--ease);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.sub-icon-wrap{width:100px;height:100px;border-radius:30px;background:linear-gradient(135deg,#fbbf24,#d97706);display:flex;align-items:center;justify-content:center;font-size:48px;color:#0a2818;margin-bottom:22px;box-shadow:0 0 0 8px rgba(251,191,36,0.15),0 20px 40px rgba(251,191,36,0.4);}
+.sub-title{font-size:26px;font-weight:900;color:#fff;margin-bottom:6px;text-align:center;}
+.sub-subtitle{font-size:13px;color:#86efac;margin-bottom:24px;text-align:center;font-weight:500;line-height:1.6;}
+.plan-card{width:100%;max-width:380px;background:linear-gradient(135deg,rgba(31,44,36,0.98),rgba(24,36,29,0.98));border:2px solid rgba(251,191,36,0.4);border-radius:22px;padding:24px 20px;margin-bottom:20px;}
+.plan-badge{display:inline-block;background:linear-gradient(135deg,#fbbf24,#d97706);color:#0a2818;font-size:10px;font-weight:900;padding:5px 12px;border-radius:20px;letter-spacing:1px;margin-bottom:12px;}
+.plan-name{font-size:22px;font-weight:900;color:#fff;margin-bottom:4px;}
+.plan-price-line{display:flex;align-items:baseline;gap:4px;margin:14px 0 20px;}
+.plan-rupee{font-size:24px;font-weight:800;color:#22c55e;}
+.plan-amount{font-size:48px;font-weight:900;color:#22c55e;letter-spacing:-2px;line-height:1;}
+.plan-duration{font-size:14px;color:#8696a0;font-weight:600;margin-left:4px;}
+.plan-features{list-style:none;padding:0;margin:0 0 20px 0;}
+.plan-features li{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:14px;color:#e9edef;font-weight:600;border-bottom:1px solid rgba(34,197,94,0.1);}
+.plan-features li:last-child{border-bottom:none;}
+.plan-features li i{width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,0.2);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.plan-buy-btn{width:100%;height:58px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 0 #0a2818,0 10px 25px rgba(34,197,94,0.5);}
+.payment-header{display:flex;align-items:center;gap:12px;width:100%;max-width:400px;margin-bottom:16px;}
+.payment-back{width:44px;height:44px;border-radius:12px;background:rgba(34,197,94,0.1);border:none;color:#4ade80;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.payment-title{font-size:18px;font-weight:800;color:#fff;flex:1;}
+.payment-title small{display:block;font-size:11px;color:#8696a0;font-weight:500;margin-top:2px;}
+.qr-container{background:#fff;border-radius:20px;padding:20px;display:flex;flex-direction:column;align-items:center;margin-bottom:16px;width:100%;max-width:340px;}
+.qr-container img{width:220px;height:220px;border-radius:12px;}
+.qr-container .qr-label{font-size:12px;color:#111;font-weight:700;margin-top:12px;}
+.qr-container .upi-copy{background:#f0fdf4;border:1px dashed #16a34a;color:#16a34a;font-size:13px;font-weight:800;padding:8px 16px;border-radius:10px;margin-top:10px;cursor:pointer;font-family:monospace;display:flex;align-items:center;gap:8px;}
+.payment-amount{background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(217,119,6,0.15));border:2px dashed rgba(251,191,36,0.5);border-radius:16px;padding:16px 24px;text-align:center;margin-bottom:16px;width:100%;max-width:340px;}
+.payment-amount .lbl{font-size:12px;color:#8696a0;font-weight:600;margin-bottom:4px;}
+.payment-amount .amt{font-size:36px;font-weight:900;color:#fbbf24;}
+.upload-box{width:100%;max-width:340px;background:rgba(34,197,94,0.08);border:2px dashed rgba(34,197,94,0.5);border-radius:16px;padding:24px 20px;text-align:center;cursor:pointer;margin-bottom:16px;}
+.upload-box i{font-size:32px;color:#4ade80;margin-bottom:8px;display:block;}
+.upload-box span{display:block;font-size:14px;color:#86efac;font-weight:800;margin-bottom:4px;}
+.upload-box small{display:block;font-size:11px;color:#667781;}
+.upload-preview{width:100%;max-width:340px;border-radius:16px;overflow:hidden;margin-bottom:16px;display:none;position:relative;border:2px solid rgba(34,197,94,0.4);}
+.upload-preview.show{display:block;}
+.upload-preview img{width:100%;max-height:250px;object-fit:contain;display:block;background:#000;}
+.upload-preview .change-btn{position:absolute;bottom:10px;right:10px;background:#22c55e;color:#fff;border:none;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;}
+.payment-submit{width:100%;max-width:340px;height:56px;background:linear-gradient(135deg,#fbbf24,#d97706);border:none;border-radius:14px;color:#0a2818;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 0 #78350f,0 10px 25px rgba(251,191,36,0.5);}
+.payment-submit:disabled{opacity:0.5;cursor:not-allowed;}
+.waiting-spinner{width:80px;height:80px;border-radius:50%;border:6px solid rgba(34,197,94,0.15);border-top-color:#22c55e;animation:spin 1s linear infinite;margin-bottom:24px;}
+.waiting-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:10px;text-align:center;}
+.waiting-text{font-size:14px;color:#86efac;text-align:center;line-height:1.6;max-width:300px;font-weight:500;}
+.waiting-info{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:14px;padding:16px 20px;margin-top:24px;max-width:300px;text-align:center;}
+.waiting-info strong{color:#22c55e;font-weight:800;font-size:13px;display:block;margin-bottom:4px;}
+.waiting-info span{color:#8696a0;font-size:12px;}
+
+.topbar{background:linear-gradient(135deg,#0d3d24 0%,#0a2818 100%);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:20;border-bottom:1px solid rgba(34,197,94,0.25);}
+.topbar-avatar{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 3px 0 #0a2818;flex-shrink:0;}
+.topbar-info{flex:1;min-width:0;}
+.topbar-info h2{font-size:16px;font-weight:900;color:#fff;line-height:1.2;}
+.topbar-info .topbar-role{font-size:10px;color:#86efac;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:5px;}
+.status-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;box-shadow:0 0 8px #22c55e;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.3);opacity:0.7;}}
+.logout-btn{background:rgba(239,68,68,0.15);border:none;color:#fca5a5;width:42px;height:42px;border-radius:12px;cursor:pointer;font-size:16px;flex-shrink:0;}
+
+#subStatusBar{background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(217,119,6,0.15));border-bottom:1px solid rgba(251,191,36,0.3);padding:10px 16px;display:none;align-items:center;gap:10px;color:#fbbf24;font-size:12px;font-weight:700;flex-shrink:0;}
+#subStatusBar.show{display:flex;}
+#subStatusBar i{font-size:14px;}
+#subStatusBar span{flex:1;}
+#subStatusBar button{background:#fbbf24;color:#0a2818;border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;}
+
+#workHoursBar{background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(37,99,235,0.12));border-bottom:1px solid rgba(59,130,246,0.3);padding:10px 16px;display:flex;align-items:center;gap:10px;color:#93c5fd;font-size:12px;font-weight:700;flex-shrink:0;}
+#workHoursBar i{font-size:14px;}
+#workHoursBar span{flex:1;}
+#workHoursBar .badge{background:#3b82f6;color:#fff;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:900;}
+
+#mainApp{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden;}
+#mainApp.show{display:flex;}
+.main-content{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;padding-bottom:100px;}
+.main-content::-webkit-scrollbar{width:5px;}
+.main-content::-webkit-scrollbar-thumb{background:rgba(34,197,94,0.4);border-radius:3px;}
+.card{background:linear-gradient(135deg,rgba(31,44,36,0.95),rgba(24,36,29,0.95));border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid rgba(34,197,94,0.15);box-shadow:0 4px 12px rgba(0,0,0,0.25);animation:cardIn 0.35s var(--ease);}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.card h3{font-size:14px;font-weight:800;color:#e9edef;margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:1.5px solid rgba(34,197,94,0.15);padding-bottom:10px;}
+.btn-3d{border:none;border-radius:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#fff;padding:12px 8px;font-size:12px;font-family:inherit;transition:transform 0.1s var(--ease);}
+.btn-3d:active{transform:translateY(3px);box-shadow:none!important;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.c-btn-full{grid-column:span 2;}
+.bg-green{background:linear-gradient(180deg,#22c55e,#16a34a);box-shadow:0 4px 0 #0a2818;}
+.bg-red{background:linear-gradient(180deg,#ef4444,#dc2626);box-shadow:0 4px 0 #7f1d1d;}
+.bg-amber{background:linear-gradient(180deg,#fbbf24,#d97706);box-shadow:0 4px 0 #78350f;}
+.bg-dark{background:linear-gradient(180deg,#475569,#334155);box-shadow:0 4px 0 #0f172a;}
+.bg-blue{background:linear-gradient(180deg,#3b82f6,#2563eb);box-shadow:0 4px 0 #1e40af;}
+.input-group input{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(34,197,94,0.2);border-radius:12px;padding:12px 14px;font-size:13px;font-family:inherit;font-weight:600;outline:none;margin-bottom:10px;color:#e9edef;}
+.input-group input:focus{border-color:#22c55e;background:rgba(34,197,94,0.08);}
+
+.subject-card{background:linear-gradient(135deg,rgba(31,44,36,0.95),rgba(24,36,29,0.95));border-radius:18px;padding:14px;margin-bottom:12px;border:1px solid rgba(34,197,94,0.15);}
+.subject-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px dashed rgba(34,197,94,0.15);}
+.subject-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex-shrink:0;}
+.subject-title{font-size:15px;font-weight:800;color:#e9edef;flex:1;}
+.subject-status{font-size:10px;font-weight:800;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,0.05);color:#8696a0;}
+.subject-status.on{background:rgba(34,197,94,0.2);color:#86efac;}
+.subject-status.off{background:rgba(239,68,68,0.2);color:#fca5a5;}
+.sub-btn-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px;}
+.sbtn{padding:10px 4px;border-radius:10px;font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;color:#fff;font-family:inherit;}
+.sbtn:active{transform:scale(0.92);}
+.sbtn i{font-size:16px;}
+.sbtn-on{background:linear-gradient(180deg,#22c55e,#16a34a);box-shadow:0 3px 0 #0a2818;}
+.sbtn-off{background:linear-gradient(180deg,#ef4444,#dc2626);box-shadow:0 3px 0 #7f1d1d;}
+.sbtn-clear{background:linear-gradient(180deg,#3b82f6,#2563eb);box-shadow:0 3px 0 #1e40af;}
+.sbtn-img{background:linear-gradient(180deg,#fbbf24,#d97706);box-shadow:0 3px 0 #78350f;}
+.sbtn-pdf{background:linear-gradient(180deg,#a855f7,#7c3aed);box-shadow:0 3px 0 #4c1d95;}
+.add-q-btn{width:100%;padding:11px;border-radius:12px;font-size:12px;font-weight:800;background:linear-gradient(135deg,#1e293b,#0f172a);color:#4ade80;border:1.5px solid rgba(34,197,94,0.3);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
+
+#floatChatBtn{position:fixed;top:0;left:0;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:3px solid #fff;display:none;align-items:center;justify-content:center;font-size:26px;cursor:pointer;z-index:9998;touch-action:none;user-select:none;box-shadow:0 6px 0 #0a2818,0 10px 30px rgba(37,211,102,0.6);}
+#floatChatBtn.show{display:flex;}
+#floatChatBtn::after{content:'CHAT';position:absolute;top:-8px;right:-8px;background:#fbbf24;color:#0a2818;font-size:9px;font-weight:900;padding:3px 8px;border-radius:10px;box-shadow:0 2px 0 #78350f,0 0 0 2px #fff;pointer-events:none;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(4,26,16,0.9);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:linear-gradient(160deg,#0d3d24,#0a2818);border-radius:22px;padding:24px 20px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto;border:1px solid rgba(34,197,94,0.3);animation:popIn 0.4s var(--bounce);}
+@keyframes popIn{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-box h3{font-size:18px;font-weight:800;margin-bottom:14px;color:#fff;display:flex;align-items:center;gap:8px;}
+.modal-box h3 i{color:#fbbf24;}
+.modal-box label{font-size:12px;font-weight:700;color:#86efac;display:block;margin-bottom:6px;margin-top:12px;}
+.modal-box textarea,.modal-box input{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(34,197,94,0.2);border-radius:12px;padding:11px 13px;font-size:13px;font-family:inherit;font-weight:600;outline:none;resize:none;color:#e9edef;}
+.modal-btn{width:100%;height:50px;border-radius:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;font-family:inherit;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-modal-save{background:linear-gradient(180deg,#22c55e,#16a34a);color:#fff;box-shadow:0 4px 0 #0a2818;}
+.btn-modal-cancel{background:rgba(255,255,255,0.08);color:#86efac;margin-top:8px;}
+.correct-opt-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:14px;}
+.correct-opt{padding:12px;border-radius:10px;font-size:13px;font-weight:800;border:1.5px solid rgba(34,197,94,0.2);background:rgba(255,255,255,0.05);color:#8696a0;cursor:pointer;font-family:inherit;}
+.correct-opt.active{background:linear-gradient(180deg,#22c55e,#16a34a);color:#fff;border-color:#22c55e;}
+
+/* POPUP - NO CLOSE */
+.sub-reminder-popup{position:fixed;inset:0;z-index:99997;background:rgba(4,26,16,0.9);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px;}
+.sub-reminder-popup.show{display:flex;}
+.sub-reminder-box{background:linear-gradient(160deg,#0d3d24,#0a2818);border:2px solid rgba(251,191,36,0.5);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:popIn 0.4s var(--bounce);}
+.sub-reminder-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#fbbf24,#d97706);display:flex;align-items:center;justify-content:center;font-size:32px;color:#0a2818;margin:0 auto 16px;}
+.sub-reminder-title{font-size:20px;font-weight:900;color:#fff;margin-bottom:8px;}
+.sub-reminder-text{font-size:13px;color:#86efac;line-height:1.6;margin-bottom:16px;font-weight:500;}
+.sub-reminder-price{background:rgba(34,197,94,0.1);border:1px dashed rgba(34,197,94,0.4);border-radius:12px;padding:12px;margin-bottom:16px;display:flex;align-items:baseline;justify-content:center;gap:4px;}
+.sub-reminder-price span{font-size:28px;font-weight:900;color:#22c55e;}
+.sub-reminder-price small{font-size:13px;color:#8696a0;font-weight:600;}
+.sub-reminder-btn{width:100%;height:52px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 0 #0a2818;}
+.sub-reminder-later{display:none!important;}
+
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(30px);background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:13px 24px;border-radius:24px;font-size:13px;font-weight:700;opacity:0;transition:all 0.35s var(--ease);z-index:99999;pointer-events:none;max-width:85%;text-align:center;box-shadow:0 10px 30px rgba(34,197,94,0.5);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.error{background:linear-gradient(135deg,#ef4444,#dc2626);}
+</style>
+</head>
+<body>
+
+<!-- ═══ BLOCKED SCREEN ═══ -->
+<div id="blockedScreen">
+  <i class="fas fa-ban"></i>
+  <h1>Account Blocked</h1>
+  <p>Owner ne aapka account block kar diya hai.</p>
+  <button onclick="requestUnblock()" style="margin-top:24px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:800;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:10px;box-shadow:0 6px 0 #14532d;"><i class="fas fa-paper-plane"></i> Request Unblock</button>
+  <a href="https://wa.me/918252780452" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp Support</a>
+  <div id="unblockStatus"></div>
+</div>
+
+<!-- ═══ REGISTRATION WAITING (NEW) ═══ -->
+<div id="regWaitingScreen">
+  <div class="reg-shield"><i class="fas fa-user-shield"></i></div>
+  <h2>Approval Pending</h2>
+  <p>Aapki registration request owner ko bhej di gayi hai.</p>
+  <p style="font-size:12px;color:#8696a0;margin-top:8px;">Approval hone ka intezaar karein...</p>
+  <div class="reg-spinner"></div>
+  <div class="reg-info">
+    <strong>⏱ Usually 2-5 minutes</strong>
+    <span>App automatic khul jayega approve hone par</span>
+  </div>
+  <div class="reg-timer" id="regTimer">Waiting...</div>
+  <button class="reg-cancel" onclick="cancelRegistration()"><i class="fas fa-sign-out-alt"></i> Cancel & Logout</button>
+</div>
+
+<!-- ═══ SUBSCRIPTION OVERLAY ═══ -->
+<div id="subOverlay">
+  <button id="subCloseBtn" onclick="closeSubscription()"><i class="fas fa-times"></i></button>
+  <div class="sub-view active" id="viewPlan">
+    <div class="sub-icon-wrap"><i class="fas fa-crown"></i></div>
+    <div class="sub-title">Premium Access</div>
+    <div class="sub-subtitle" id="subSubtitle">Full access unlock karne ke liye subscribe karein</div>
+    <div class="plan-card">
+      <div class="plan-badge">⭐ BEST VALUE</div>
+      <div class="plan-name">Premium Plan</div>
+      <div class="plan-price-line">
+        <span class="plan-rupee">₹</span>
+        <span class="plan-amount" id="planAmount">99</span>
+        <span class="plan-duration">/ <span id="planDays">30</span> days</span>
+      </div>
+      <ul class="plan-features">
+        <li><i class="fas fa-check"></i> All 6 Subjects Access</li>
+        <li><i class="fas fa-check"></i> Unlimited Free Tests</li>
+        <li><i class="fas fa-check"></i> NCERT Books & Notes</li>
+        <li><i class="fas fa-check"></i> Doubt Chat Support</li>
+        <li><i class="fas fa-check"></i> Priority 24/7 Help</li>
+      </ul>
+      <button class="plan-buy-btn" onclick="goToPayment()"><i class="fas fa-shopping-cart"></i> Please Buy Now</button>
+    </div>
+  </div>
+  <div class="sub-view" id="viewPayment">
+    <div class="payment-header">
+      <button class="payment-back" onclick="goToPlan()"><i class="fas fa-arrow-left"></i></button>
+      <div class="payment-title">Complete Payment<small>Scan & upload screenshot</small></div>
+    </div>
+    <div class="qr-container">
+      <img id="qrImage" src="">
+      <div class="qr-label">Scan with any UPI app</div>
+      <div class="upi-copy" onclick="copyUPI()"><i class="fas fa-copy"></i> <span id="upiDisplay">upiclone1@slc</span></div>
+    </div>
+    <div class="payment-amount"><div class="lbl">Amount to Pay</div><div class="amt" id="payAmount">₹99</div></div>
+    <div class="upload-box" id="uploadBox" onclick="document.getElementById('screenshotInput').click()">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <span id="uploadLabel">Upload Payment Screenshot</span>
+      <small>Gallery se photo select karein</small>
+    </div>
+    <div class="upload-preview" id="uploadPreview">
+      <img id="previewImg" src="">
+      <button class="change-btn" onclick="document.getElementById('screenshotInput').click()"><i class="fas fa-redo"></i> Change</button>
+    </div>
+    <input type="file" id="screenshotInput" accept="image/*" style="display:none;">
+    <button class="payment-submit" id="submitPayBtn" disabled onclick="submitPayment()"><i class="fas fa-paper-plane"></i> Submit for Approval</button>
+  </div>
+  <div class="sub-view" id="viewWaiting">
+    <div class="waiting-spinner"></div>
+    <div class="waiting-title">Waiting for Approval</div>
+    <div class="waiting-text">Screenshot owner ko bhej diya. Approval ka wait karein...</div>
+    <div class="waiting-info"><strong>Usually 2-5 minutes</strong><span>App automatic khul jayega approve hone par</span></div>
+  </div>
+</div>
+
+<!-- ═══ AUTH SCREEN ═══ -->
+<div id="authScreen">
+  <div class="auth-logo"><i class="fas fa-graduation-cap"></i></div>
+  <h1>JMKCC Study</h1>
+  <div class="sub">Admin Control Panel</div>
+  <input type="text" id="loginName" class="auth-input" placeholder="Aapka Naam">
+  <input type="tel" id="loginNumber" class="auth-input" placeholder="10-digit Number" maxlength="10">
+  <input type="password" id="loginPass" class="auth-input" placeholder="Password">
+  <button class="auth-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Register / Login</button>
+  <div class="forgot-link"><button onclick="openForgotModal()"><i class="fas fa-key"></i> Forgot Password?</button></div>
+</div>
+
+<div class="app-container">
+  <div id="mainApp">
+    <div class="topbar">
+      <div class="topbar-avatar"><i class="fas fa-graduation-cap"></i></div>
+      <div class="topbar-info">
+        <h2>JMKCC Study</h2>
+        <div class="topbar-role"><span class="status-dot"></span> Admin Panel • Online</div>
+      </div>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+    <div id="subStatusBar">
+      <i class="fas fa-crown"></i><span id="subStatusText">Subscription: Loading...</span>
+      <button onclick="openSubscription(false)">Renew</button>
+    </div>
+    <div id="workHoursBar">
+      <i class="fas fa-clock"></i><span id="workHoursText">Working Hours: 24x7</span>
+      <span class="badge" id="workHoursBadge">OPEN</span>
+    </div>
+    <div class="main-content">
+      <div class="card">
+        <h3><i class="fas fa-crown" style="color:#fbbf24;"></i> Master Controls</h3>
+        <div class="grid-2">
+          <button class="btn-3d bg-green c-btn-full" onclick="sendCmd('/starttest all')"><i class="fas fa-play"></i> Start All Tests</button>
+          <button class="btn-3d bg-red c-btn-full" onclick="sendCmd('/stoptest all')"><i class="fas fa-stop"></i> Stop All Tests</button>
+          <button class="btn-3d bg-amber c-btn-full" onclick="sendCmd('/blockall')"><i class="fas fa-user-slash"></i> Block All</button>
+          <button class="btn-3d bg-green c-btn-full" onclick="sendCmd('/unblockall')"><i class="fas fa-user-check"></i> Unblock All</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-clock" style="color:#3b82f6;"></i> Working Hours</h3>
+        <div class="grid-2">
+          <div class="input-group"><input type="time" id="whStart" value="09:00"></div>
+          <div class="input-group"><input type="time" id="whEnd" value="21:00"></div>
+        </div>
+        <div class="grid-2">
+          <button class="btn-3d bg-blue" onclick="setWorkHours()"><i class="fas fa-save"></i> Save</button>
+          <button class="btn-3d bg-dark" onclick="clearWorkHours()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;padding:0 4px;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-book" style="color:#22c55e;font-size:16px;"></i>
+        <span style="font-size:15px;font-weight:800;color:#e9edef;">Subjects (6)</span>
+      </div>
+      <div id="subjectsContainer"></div>
+      <div class="card">
+        <h3><i class="fas fa-user-shield" style="color:#a855f7;"></i> Student Management</h3>
+        <div class="input-group"><input type="tel" id="studentMobile" placeholder="Student 10-digit number" maxlength="10"></div>
+        <div class="grid-3">
+          <button class="btn-3d bg-red" onclick="studentAction('/block')"><i class="fas fa-ban"></i> Block</button>
+          <button class="btn-3d bg-green" onclick="studentAction('/unblock')"><i class="fas fa-check"></i> Unblock</button>
+          <button class="btn-3d bg-dark" onclick="studentAction('/clearchat')"><i class="fas fa-broom"></i> Clear</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-rupee-sign" style="color:#22c55e;"></i> Fee Management</h3>
+        <div class="input-group"><input type="tel" id="feeMobile" placeholder="Student number" maxlength="10"></div>
+        <div class="input-group"><input type="number" id="feeAmount" placeholder="Amount (₹)"></div>
+        <div class="grid-3">
+          <button class="btn-3d bg-green" onclick="feeAction('/paid')"><i class="fas fa-check"></i> Paid</button>
+          <button class="btn-3d bg-red" onclick="feeAction('/unpaid')"><i class="fas fa-times"></i> Unpaid</button>
+          <button class="btn-3d bg-amber" onclick="feeAction('/feealert')"><i class="fas fa-bell"></i> Alert</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-bullhorn" style="color:#fbbf24;"></i> Send Notice</h3>
+        <div class="input-group"><input type="text" id="noticeMsg" placeholder="Message for all students..."></div>
+        <button class="btn-3d bg-amber" onclick="sendNotice()" style="width:100%;padding:14px;"><i class="fas fa-paper-plane"></i> Broadcast Notice</button>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-reply" style="color:#22c55e;"></i> Quick Reply</h3>
+        <div class="input-group"><input type="tel" id="replyMobile" placeholder="Student Mobile Number" maxlength="10"></div>
+        <div class="input-group"><input type="text" id="replyMsg" placeholder="Your Reply Message"></div>
+        <button class="btn-3d bg-green" onclick="sendReply()" style="width:100%;padding:14px;"><i class="fas fa-paper-plane"></i> Send Reply</button>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i> Warn Student</h3>
+        <div class="input-group"><input type="tel" id="warnMobile" placeholder="Student number" maxlength="10"></div>
+        <div class="input-group"><input type="text" id="warnMsg" placeholder="Warning message..."></div>
+        <button class="btn-3d bg-amber" onclick="sendWarn()" style="width:100%;padding:14px;"><i class="fas fa-exclamation-circle"></i> Send Warning</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="floatChatBtn"><i class="fas fa-comments"></i></button>
+
+<div class="modal-overlay" id="questionModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-plus-circle"></i> Add Question - <span id="qSubjectName"></span></h3>
+    <label>Question</label><textarea id="qText" rows="2" placeholder="Question..."></textarea>
+    <label>Option 1</label><input type="text" id="qOpt1">
+    <label>Option 2</label><input type="text" id="qOpt2">
+    <label>Option 3</label><input type="text" id="qOpt3">
+    <label>Option 4</label><input type="text" id="qOpt4">
+    <label>Correct Answer</label>
+    <div class="correct-opt-row">
+      <button class="correct-opt active" onclick="selectCorrect(1,this)">1</button>
+      <button class="correct-opt" onclick="selectCorrect(2,this)">2</button>
+      <button class="correct-opt" onclick="selectCorrect(3,this)">3</button>
+      <button class="correct-opt" onclick="selectCorrect(4,this)">4</button>
+    </div>
+    <button class="modal-btn btn-modal-save" onclick="submitQuestion()"><i class="fas fa-check"></i> Add</button>
+    <button class="modal-btn btn-modal-cancel" onclick="closeModal('questionModal')">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-key"></i> Forgot Password</h3>
+    <p style="font-size:12px;color:#86efac;line-height:1.6;margin-bottom:14px;">Owner ko request jayegi, naya password milega.</p>
+    <label>Registered Name</label><input type="text" id="forgotName" placeholder="Aapka naam">
+    <label>Registered Mobile</label><input type="tel" id="forgotMobile" placeholder="10-digit number" maxlength="10">
+    <button class="modal-btn btn-modal-save" onclick="submitForgot()"><i class="fas fa-paper-plane"></i> Send Request</button>
+    <button class="modal-btn btn-modal-cancel" onclick="closeModal('forgotModal')">Cancel</button>
+  </div>
+</div>
+
+<input type="file" id="subjImg" accept="image/*" style="display:none;" onchange="uploadSubjectFile(event, 'image')">
+<input type="file" id="subjPdf" accept="application/pdf" style="display:none;" onchange="uploadSubjectFile(event, 'pdf')">
+
+<div class="sub-reminder-popup" id="subReminderPopup">
+  <div class="sub-reminder-box">
+    <div class="sub-reminder-icon" id="subReminderIcon"><i class="fas fa-crown"></i></div>
+    <div class="sub-reminder-title" id="subReminderTitle">Subscription Expiring!</div>
+    <div class="sub-reminder-text" id="subReminderText">Aapki subscription jaldi khatam ho jayegi.</div>
+    <div class="sub-reminder-price">
+      <span>₹<span id="subReminderPrice">99</span></span>
+      <small>/ <span id="subReminderDays">30</span> days</small>
+    </div>
+    <button class="sub-reminder-btn" onclick="openSubFromReminder()"><i class="fas fa-shopping-cart"></i> Subscribe Now</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var BOT_TOKEN = '8864112645:AAHTMjpWSfPxhqAB8pkgwm-j49OXAGWs1zI';
+var CHAT_ID = '8709228094';
+var EXTERNAL_LINK = 'https://achiit.github.io/dukaan-chat-story';
+var UPI_ID = 'upiclone1@slc';
+var FREE_TRIAL_DAYS = 3;
+var PAID_DAYS = 30;
+var POLL_INTERVAL = 1500;
+
+var adminData = null;
+var currentSubject = null;
+var correctOpt = 1;
+var screenshotFile = null;
+var lastUpdateId = 0;
+var approvalCheck = null;
+var forcePay = false;
+var adminAllowsClose = false;
+var regPollTimer = null;
+
+var SUBJECTS = [
+  { id:'maths', name:'Maths', icon:'fa-calculator', color:'linear-gradient(135deg,#3b82f6,#1e40af)' },
+  { id:'physics', name:'Physics', icon:'fa-atom', color:'linear-gradient(135deg,#8b5cf6,#6d28d9)' },
+  { id:'chemistry', name:'Chemistry', icon:'fa-flask', color:'linear-gradient(135deg,#10b981,#047857)' },
+  { id:'biology', name:'Biology', icon:'fa-dna', color:'linear-gradient(135deg,#f59e0b,#b45309)' },
+  { id:'english', name:'English', icon:'fa-language', color:'linear-gradient(135deg,#ef4444,#b91c1c)' },
+  { id:'hindi', name:'Hindi', icon:'fa-book-open', color:'linear-gradient(135deg,#ec4899,#be185d)' }
+];
+
+try {
+  var saved = localStorage.getItem('jmkcc_admin_data');
+  if (saved) adminData = JSON.parse(saved);
+  lastUpdateId = parseInt(localStorage.getItem('jmkcc_admin_lastup') || '0') || 0;
+} catch(e) {}
+
+// ═══════════════════════════════════════
+// REGISTRATION APPROVAL SYSTEM (NEW)
+// ═══════════════════════════════════════
+
+// Check if number is approved
+function isApproved(number) {
+  if (localStorage.getItem('jmkcc_approved_' + number) === 'true') return true;
+  if (localStorage.getItem('jmkcc_approved_' + number) === 'false') return false;
+  return false;
+}
+
+function isRejected(number) {
+  return localStorage.getItem('jmkcc_approved_' + number) === 'false';
+}
+
+// Send registration request to Telegram
+function sendRegistrationRequest() {
+  if (!adminData) return;
+  var num = adminData.number;
+  var lastSent = parseInt(localStorage.getItem('jmkcc_reg_pending_' + num) || '0');
+  if (Date.now() - lastSent < 5 * 60 * 1000) return;
+  localStorage.setItem('jmkcc_reg_pending_' + num, String(Date.now()));
+  
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      parse_mode: 'Markdown',
+      text: '🆕 *NEW REGISTRATION REQUEST*\n\n' +
+        '━━━━━━━━━━━━━━\n' +
+        '👤 Name: *' + adminData.name + '*\n' +
+        '📱 Mobile: `' + num + '`\n' +
+        '🔑 Password: `' + adminData.pass + '`\n' +
+        '⏰ Time: ' + new Date().toLocaleString() + '\n' +
+        '━━━━━━━━━━━━━━\n\n' +
+        '👇 Click below to approve/reject',
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '✅ Approve Registration', callback_data: 'regapprove_' + num }],
+          [{ text: '❌ Reject', callback_data: 'regreject_' + num }]
+        ]
+      }
+    })
+  }).catch(function() {});
+}
+
+// Show registration waiting screen
+function showRegWaiting() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('regWaitingScreen').classList.add('show');
+  document.getElementById('regTimer').textContent = 'Waiting for approval...';
+  sendRegistrationRequest();
+  startRegPolling();
+}
+
+// Poll for approval
+function startRegPolling() {
+  if (regPollTimer) clearInterval(regPollTimer);
+  var startTime = Date.now();
+  regPollTimer = setInterval(function() {
+    if (!adminData) { clearInterval(regPollTimer); return; }
+    var num = adminData.number;
+    
+    if (isApproved(num)) {
+      clearInterval(regPollTimer);
+      regPollTimer = null;
+      unlockReg();
+      return;
+    }
+    
+    if (isRejected(num)) {
+      clearInterval(regPollTimer);
+      regPollTimer = null;
+      document.getElementById('regTimer').textContent = '❌ Request rejected by owner';
+      setTimeout(function() { cancelRegistration(); }, 3000);
+      return;
+    }
+    
+    var elapsed = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById('regTimer').textContent = 'Waiting ' + elapsed + 's...';
+    
+    // Resend after 5 min if not approved
+    if (elapsed > 0 && elapsed % 300 === 0) sendRegistrationRequest();
+  }, 2000);
+}
+
+// Unlock the app after approval
+function unlockReg() {
+  document.getElementById('regWaitingScreen').classList.remove('show');
+  document.getElementById('authScreen').style.display = 'none';
+  startMainApp();
+  toast('✅ Welcome ' + adminData.name + '!', 'success');
+}
+
+// Cancel registration / go back to login
+function cancelRegistration() {
+  localStorage.removeItem('jmkcc_admin_data');
+  if (adminData) localStorage.removeItem('jmkcc_reg_pending_' + adminData.number);
+  adminData = null;
+  document.getElementById('regWaitingScreen').classList.remove('show');
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginNumber').value = '';
+  document.getElementById('loginPass').value = '';
+  if (regPollTimer) clearInterval(regPollTimer);
+  toast('Registration cancelled', 'error');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('load', function() {
+  restoreFabPosition();
+  setupFabDrag();
+  
+  if (localStorage.getItem('jmkcc_admin_blocked') === 'true') {
+    document.getElementById('blockedScreen').classList.add('show');
+    document.getElementById('authScreen').style.display = 'none';
+    startCommandPolling();
+    return;
+  }
+  
+  // ⭐ Check approval before starting app
+  if (adminData && adminData.name) {
+    if (isApproved(adminData.number)) {
+      document.getElementById('authScreen').style.display = 'none';
+      startMainApp();
+    } else if (isRejected(adminData.number)) {
+      // Was rejected previously - show login
+      document.getElementById('authScreen').style.display = 'flex';
+      toast('❌ Registration was rejected', 'error');
+    } else {
+      // Pending - show waiting
+      showRegWaiting();
+    }
+  }
+  
+  startCommandPolling();
+  document.getElementById('screenshotInput').addEventListener('change', handleScreenshot);
+});
+
+// ═══════════════════════════════════════
+// LOGIN WITH APPROVAL CHECK
+// ═══════════════════════════════════════
+function doLogin() {
+  var name = document.getElementById('loginName').value.trim();
+  var number = document.getElementById('loginNumber').value.trim();
+  var pass = document.getElementById('loginPass').value.trim();
+  
+  if (name.length < 2) return toast('Naam daalein!', 'error');
+  if (number.length !== 10) return toast('Sahi 10-digit number!', 'error');
+  if (pass.length < 4) return toast('Password 4+ characters!', 'error');
+  
+  if (localStorage.getItem('jmkcc_admin_blocked') === 'true') {
+    document.getElementById('blockedScreen').classList.add('show');
+    return;
+  }
+  
+  adminData = { name: name, number: number, pass: pass };
+  localStorage.setItem('jmkcc_admin_data', JSON.stringify(adminData));
+  
+  // ⭐ Check approval
+  if (isApproved(number)) {
+    document.getElementById('authScreen').style.display = 'none';
+    startMainApp();
+    toast('Welcome ' + name + '!');
+  } else {
+    showRegWaiting();
+  }
+}
+
+function logout() {
+  if (!confirm('Logout?')) return;
+  localStorage.removeItem('jmkcc_admin_data');
+  location.reload();
+}
+
+function startMainApp() {
+  if (localStorage.getItem('jmkcc_admin_blocked') === 'true') {
+    document.getElementById('blockedScreen').classList.add('show');
+    return;
+  }
+  document.getElementById('mainApp').style.display = 'flex';
+  document.getElementById('mainApp').classList.add('show');
+  
+  var expiry = parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0');
+  if (expiry <= Date.now()) {
+    if (!localStorage.getItem('jmkcc_trial_started')) {
+      startFreeTrial();
+    } else {
+      activateLock();
+    }
+  }
+  updateSubStatusBar();
+  updateWorkHoursBar();
+  renderSubjects();
+  showFab();
+  setInterval(function() {
+    if (!isSubActive() && !forcePay) activateLock();
+    updateWorkHoursBar();
+  }, 5000);
+}
+
+function startFreeTrial() {
+  var expiry = Date.now() + (FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
+  localStorage.setItem('jmkcc_sub_expiry', String(expiry));
+  localStorage.setItem('jmkcc_trial_started', 'true');
+  localStorage.setItem('jmkcc_trial_expiry', String(expiry));
+  if (adminData) sendToTelegram('🆓 *FREE TRIAL*\n\n👤 ' + adminData.name + '\n📱 `' + adminData.number + '`\n📅 ' + FREE_TRIAL_DAYS + ' days');
+  toast('🎉 ' + FREE_TRIAL_DAYS + ' days trial started!', 'success');
+}
+
+// ═══ FORGOT PASSWORD ═══
+function openForgotModal() {
+  document.getElementById('forgotName').value = '';
+  document.getElementById('forgotMobile').value = '';
+  document.getElementById('forgotModal').classList.add('show');
+}
+function submitForgot() {
+  var name = document.getElementById('forgotName').value.trim();
+  var number = document.getElementById('forgotMobile').value.trim();
+  if (name.length < 2) return toast('Naam daalein!', 'error');
+  if (number.length !== 10) return toast('Sahi 10-digit number!', 'error');
+  localStorage.setItem('jmkcc_pending_reset', number);
+  localStorage.setItem('jmkcc_pending_reset_name', name);
+  sendToTelegram('🔑 *PASSWORD RESET REQUEST*\n\n👤 ' + name + '\n📱 `' + number + '`\n⏰ ' + new Date().toLocaleString() + '\n\n✅ `/resetpass ' + number + ' [newpassword]`');
+  closeModal('forgotModal');
+  toast('✅ Request sent!', 'success');
+}
+
+function showNewPassword(newPass, forNumber) {
+  try {
+    var saved = JSON.parse(localStorage.getItem('jmkcc_admin_data') || 'null');
+    if (saved && saved.number === forNumber) {
+      saved.pass = newPass;
+      localStorage.setItem('jmkcc_admin_data', JSON.stringify(saved));
+      adminData = saved;
+    }
+  } catch(e) {}
+  localStorage.removeItem('jmkcc_pending_reset');
+  var icon = document.getElementById('subReminderIcon');
+  icon.className = 'sub-reminder-icon';
+  icon.style.background = 'linear-gradient(135deg,#22c55e,#15803d)';
+  icon.innerHTML = '<i class="fas fa-key"></i>';
+  document.getElementById('subReminderTitle').textContent = '🔑 New Password';
+  document.getElementById('subReminderText').innerHTML = 'Aapka naya password:<br><br><div style="background:#22c55e;color:#0a2818;padding:14px;border-radius:12px;font-family:monospace;font-size:22px;font-weight:900;letter-spacing:2px;margin:10px 0;">' + newPass + '</div>';
+  document.querySelector('.sub-reminder-price').style.display = 'none';
+  var btn = document.querySelector('.sub-reminder-btn');
+  btn.innerHTML = '<i class="fas fa-check"></i> Got it';
+  btn.onclick = function() {
+    adminAllowsClose = true;
+    closeSubReminder();
+    var passInput = document.getElementById('loginPass');
+    if (passInput) passInput.value = newPass;
+  };
+  document.getElementById('subReminderPopup').classList.add('show');
+  try { history.pushState(null, '', location.href); } catch(e) {}
+}
+
+function requestUnblock() {
+  var savedAdmin = null;
+  try { savedAdmin = JSON.parse(localStorage.getItem('jmkcc_admin_data') || 'null'); } catch(e) {}
+  if (!savedAdmin || !savedAdmin.number) {
+    document.getElementById('unblockStatus').textContent = '❌ Contact WhatsApp support.';
+    return;
+  }
+  document.getElementById('unblockStatus').textContent = '📤 Sending...';
+  sendToTelegram('🔓 *UNBLOCK REQUEST*\n\n👤 ' + savedAdmin.name + '\n📱 `' + savedAdmin.number + '`\n\n✅ `/unblockadmin ' + savedAdmin.number + '`');
+  setTimeout(function() {
+    document.getElementById('unblockStatus').textContent = '✅ Request sent!';
+    document.getElementById('unblockStatus').style.color = '#86efac';
+  }, 1000);
+  setInterval(function() {
+    if (localStorage.getItem('jmkcc_admin_blocked') !== 'true') location.reload();
+  }, 2000);
+}
+
+// ═══ SUBSCRIPTION ═══
+function isSubActive() { return parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0') > Date.now(); }
+function getSubAmount() { return localStorage.getItem('jmkcc_sub_amount') || '99'; }
+function getSubDays() { return localStorage.getItem('jmkcc_sub_days') || String(PAID_DAYS); }
+
+function openSubscription(force) {
+  forcePay = (force === true);
+  if (forcePay) document.body.style.overflow = 'hidden';
+  var closeBtn = document.getElementById('subCloseBtn');
+  if (forcePay) { closeBtn.classList.add('hidden'); document.getElementById('subSubtitle').textContent = 'Trial khatam! Payment zaroori hai'; }
+  else { closeBtn.classList.remove('hidden'); document.getElementById('subSubtitle').textContent = 'Full access unlock karne ke liye subscribe karein'; }
+  document.getElementById('viewPlan').classList.add('active');
+  document.getElementById('viewPayment').classList.remove('active');
+  document.getElementById('viewWaiting').classList.remove('active');
+  document.getElementById('planAmount').textContent = getSubAmount();
+  document.getElementById('planDays').textContent = getSubDays();
+  document.getElementById('subOverlay').classList.add('show');
+}
+function closeSubscription() {
+  if (forcePay) { toast('⚠️ Payment zaroori hai!', 'error'); return; }
+  document.getElementById('subOverlay').classList.remove('show');
+}
+function activateLock() {
+  forcePay = true;
+  document.body.style.overflow = 'hidden';
+  document.getElementById('subOverlay').classList.add('show');
+  document.getElementById('subCloseBtn').classList.add('hidden');
+  document.getElementById('viewWaiting').classList.remove('active');
+  document.getElementById('viewPayment').classList.remove('active');
+  document.getElementById('viewPlan').classList.add('active');
+  document.getElementById('planAmount').textContent = getSubAmount();
+  document.getElementById('planDays').textContent = getSubDays();
+  document.getElementById('subSubtitle').textContent = 'Trial khatam! Payment zaroori hai';
+  try { history.pushState(null, '', location.href); } catch(e) {}
+}
+function unlockSubscription() {
+  forcePay = false;
+  document.getElementById('subOverlay').classList.remove('show');
+  document.getElementById('subCloseBtn').classList.remove('hidden');
+  document.body.style.overflow = '';
+  updateSubStatusBar();
+  toast('✅ Subscription Activated!', 'success');
+}
+window.addEventListener('popstate', function() {
+  if (forcePay) { try { history.pushState(null, '', location.href); } catch(e) {} document.getElementById('subOverlay').classList.add('show'); toast('⚠️ Payment required!', 'error'); }
+  if (document.getElementById('subReminderPopup').classList.contains('show')) { try { history.pushState(null, '', location.href); } catch(e) {} toast('⚠️ Popup admin band kar sakta hai!', 'error'); }
+});
+window.addEventListener('beforeunload', function(e) {
+  if (forcePay || document.getElementById('subReminderPopup').classList.contains('show')) { e.preventDefault(); e.returnValue = '⚠️ Payment pending.'; return e.returnValue; }
+});
+document.addEventListener('keydown', function(e) {
+  if (forcePay && (e.key === 'Escape' || e.key === 'Esc')) { e.preventDefault(); toast('⚠️ Payment required!', 'error'); }
+  if (document.getElementById('subReminderPopup').classList.contains('show') && (e.key === 'Escape' || e.key === 'Esc')) { e.preventDefault(); toast('⚠️ Popup admin band kar sakta hai!', 'error'); }
+});
+
+function goToPayment() {
+  var amount = getSubAmount();
+  var upiUrl = 'upi://pay?pa=' + UPI_ID + '&pn=JMKCC Study&am=' + amount + '&cu=INR';
+  document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(upiUrl);
+  document.getElementById('upiDisplay').textContent = UPI_ID;
+  document.getElementById('payAmount').textContent = '₹' + amount;
+  screenshotFile = null;
+  document.getElementById('uploadPreview').classList.remove('show');
+  document.getElementById('uploadBox').style.display = 'block';
+  document.getElementById('submitPayBtn').disabled = true;
+  document.getElementById('submitPayBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+  document.getElementById('screenshotInput').value = '';
+  document.getElementById('viewPlan').classList.remove('active');
+  document.getElementById('viewPayment').classList.add('active');
+}
+function goToPlan() {
+  document.getElementById('viewPayment').classList.remove('active');
+  document.getElementById('viewPlan').classList.add('active');
+}
+function copyUPI() { navigator.clipboard.writeText(UPI_ID).then(function() { toast('UPI copied!'); }).catch(function() { toast('UPI: ' + UPI_ID); }); }
+
+function handleScreenshot(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  screenshotFile = file;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('previewImg').src = ev.target.result;
+    document.getElementById('uploadPreview').classList.add('show');
+    document.getElementById('uploadBox').style.display = 'none';
+    document.getElementById('submitPayBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitPayment() {
+  if (!screenshotFile || !adminData) return;
+  var amount = getSubAmount();
+  var days = getSubDays();
+  var btn = document.getElementById('submitPayBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+  var fd = new FormData();
+  fd.append('chat_id', CHAT_ID);
+  fd.append('photo', screenshotFile);
+  fd.append('parse_mode', 'Markdown');
+  fd.append('caption', '💰 *NEW PAYMENT REQUEST*\n\n👤 *' + adminData.name + '*\n📱 `' + adminData.number + '`\n💵 *₹' + amount + '*\n📅 *' + days + ' days*\n⏰ ' + new Date().toLocaleString() + '\n\n👇 Click below');
+  fd.append('reply_markup', JSON.stringify({
+    inline_keyboard: [
+      [{ text: '✅ Approve ' + days + ' days', callback_data: 'approve_' + adminData.number }],
+      [{ text: '❌ Reject', callback_data: 'reject_' + adminData.number }],
+      [{ text: '🚫 Block User', callback_data: 'block_' + adminData.number }]
+    ]
+  }));
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.ok) {
+        document.getElementById('subCloseBtn').classList.add('hidden');
+        forcePay = true;
+        document.getElementById('viewPayment').classList.remove('active');
+        document.getElementById('viewWaiting').classList.add('active');
+        startApprovalPolling();
+      } else {
+        toast('Upload failed!', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+      }
+    })
+    .catch(function() {
+      toast('Network error!', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+    });
+}
+
+function startApprovalPolling() {
+  if (approvalCheck) clearInterval(approvalCheck);
+  approvalCheck = setInterval(function() {
+    if (isSubActive()) {
+      clearInterval(approvalCheck);
+      approvalCheck = null;
+      unlockSubscription();
+      adminAllowsClose = true;
+      closeSubReminder();
+    }
+  }, 2000);
+}
+
+function updateSubStatusBar() {
+  var bar = document.getElementById('subStatusBar');
+  var text = document.getElementById('subStatusText');
+  var expiry = parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0');
+  var trialExpiry = parseInt(localStorage.getItem('jmkcc_trial_expiry') || '0');
+  if (expiry > Date.now()) {
+    var days = Math.ceil((expiry - Date.now()) / (24 * 60 * 60 * 1000));
+    text.textContent = (trialExpiry && expiry === trialExpiry ? '🆓 Trial: ' : '⭐ Premium: ') + days + ' days';
+    bar.classList.add('show');
+  } else {
+    text.textContent = '❌ EXPIRED';
+    bar.classList.add('show');
+  }
+}
+
+function setWorkHours() {
+  var start = document.getElementById('whStart').value;
+  var end = document.getElementById('whEnd').value;
+  if (!start || !end) return toast('Time select karein!', 'error');
+  localStorage.setItem('jmkcc_wh_start', start);
+  localStorage.setItem('jmkcc_wh_end', end);
+  updateWorkHoursBar();
+  sendToTelegram('⏰ *WORK HOURS*\n\n📅 ' + start + ' - ' + end);
+  toast('Saved!', 'success');
+}
+function clearWorkHours() {
+  localStorage.removeItem('jmkcc_wh_start');
+  localStorage.removeItem('jmkcc_wh_end');
+  updateWorkHoursBar();
+  sendToTelegram('⏰ 24x7 open');
+  toast('Cleared!');
+}
+function updateWorkHoursBar() {
+  var start = localStorage.getItem('jmkcc_wh_start');
+  var end = localStorage.getItem('jmkcc_wh_end');
+  var text = document.getElementById('workHoursText');
+  var badge = document.getElementById('workHoursBadge');
+  if (!text || !badge) return;
+  if (!start || !end) { text.textContent = 'Working Hours: 24x7'; badge.textContent = 'OPEN'; badge.style.background = '#22c55e'; return; }
+  text.textContent = 'Working Hours: ' + start + ' - ' + end;
+  document.getElementById('whStart').value = start;
+  document.getElementById('whEnd').value = end;
+  var now = new Date();
+  var nowMin = now.getHours() * 60 + now.getMinutes();
+  var sMin = parseInt(start.split(':')[0]) * 60 + parseInt(start.split(':')[1]);
+  var eMin = parseInt(end.split(':')[0]) * 60 + parseInt(end.split(':')[1]);
+  var isOpen = (sMin <= eMin) ? (nowMin >= sMin && nowMin < eMin) : (nowMin >= sMin || nowMin < eMin);
+  badge.textContent = isOpen ? 'OPEN' : 'CLOSED';
+  badge.style.background = isOpen ? '#22c55e' : '#ef4444';
+}
+
+// ═══ POPUP ═══
+function showSubReminderPopup() {
+  var icon = document.getElementById('subReminderIcon');
+  icon.className = 'sub-reminder-icon';
+  icon.style.background = 'linear-gradient(135deg,#fbbf24,#d97706)';
+  icon.innerHTML = '<i class="fas fa-crown"></i>';
+  document.getElementById('subReminderTitle').textContent = 'Premium Access';
+  document.getElementById('subReminderText').textContent = 'Full access ke liye subscribe karein!';
+  document.querySelector('.sub-reminder-price').style.display = 'flex';
+  var btn = document.querySelector('.sub-reminder-btn');
+  btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Subscribe Now';
+  btn.onclick = openSubFromReminder;
+  document.getElementById('subReminderPrice').textContent = getSubAmount();
+  document.getElementById('subReminderDays').textContent = getSubDays();
+  document.getElementById('subReminderPopup').classList.add('show');
+  try { history.pushState(null, '', location.href); } catch(e) {}
+}
+function showCustomPopup(message) {
+  var icon = document.getElementById('subReminderIcon');
+  icon.className = 'sub-reminder-icon';
+  icon.style.background = 'linear-gradient(135deg,#fbbf24,#d97706)';
+  icon.innerHTML = '<i class="fas fa-bullhorn"></i>';
+  document.getElementById('subReminderTitle').textContent = 'Notice';
+  document.getElementById('subReminderText').textContent = message;
+  document.querySelector('.sub-reminder-price').style.display = 'none';
+  var btn = document.querySelector('.sub-reminder-btn');
+  btn.innerHTML = '<i class="fas fa-check"></i> Got it';
+  btn.onclick = function() { adminAllowsClose = true; closeSubReminder(); };
+  document.getElementById('subReminderPopup').classList.add('show');
+  try { history.pushState(null, '', location.href); } catch(e) {}
+}
+function closeSubReminder() {
+  if (adminAllowsClose === true) {
+    document.getElementById('subReminderPopup').classList.remove('show');
+    adminAllowsClose = false;
+    return;
+  }
+  toast('⚠️ Popup admin band kar sakta hai!', 'error');
+}
+function openSubFromReminder() { openSubscription(true); }
+
+// ═══ POLLING ═══
+function startCommandPolling() { pollTelegram(); }
+function pollTelegram() {
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/getUpdates?offset=' + (lastUpdateId + 1) + '&timeout=0')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.ok && data.result && data.result.length) {
+        data.result.forEach(function(up) {
+          if (up.update_id > lastUpdateId) {
+            lastUpdateId = up.update_id;
+            try { localStorage.setItem('jmkcc_admin_lastup', lastUpdateId); } catch(e) {}
+          }
+          if (up.message && up.message.text) handleCommand(up.message.text);
+          if (up.callback_query) handleCallbackQuery(up.callback_query);
+        });
+      }
+    })
+    .catch(function() {})
+    .finally(function() { setTimeout(pollTelegram, POLL_INTERVAL); });
+}
+
+// ═══ CALLBACK ═══
+function handleCallbackQuery(cq) {
+  var data = cq.data || '';
+  var cqId = cq.id;
+  var myNum = adminData ? adminData.number : '';
+  var chatId = cq.message && cq.message.chat ? cq.message.chat.id : CHAT_ID;
+  var msgId = cq.message ? cq.message.message_id : null;
+  var fromChatId = cq.message && cq.message.chat ? String(cq.message.chat.id) : '';
+  if (fromChatId !== String(CHAT_ID)) { answerCallback(cqId, '⛔ Not authorized'); return; }
+  var days = parseInt(getSubDays()) || PAID_DAYS;
+  
+  // ⭐ REGISTRATION APPROVE
+  if (data.indexOf('regapprove_') === 0) {
+    var targetNum = data.substring(11);
+    localStorage.setItem('jmkcc_approved_' + targetNum, 'true');
+    answerCallback(cqId, '✅ Registration approved');
+    sendToTelegram('✅ *REGISTRATION APPROVED*\n\n📱 `' + targetNum + '`\n⏰ ' + new Date().toLocaleString());
+    if (msgId) editMessageReplyMarkup(chatId, msgId);
+    if (adminData && adminData.number === targetNum) {
+      if (regPollTimer) { clearInterval(regPollTimer); regPollTimer = null; }
+      unlockReg();
+    }
+    return;
+  }
+  
+  // ⭐ REGISTRATION REJECT
+  if (data.indexOf('regreject_') === 0) {
+    var targetNum = data.substring(10);
+    localStorage.setItem('jmkcc_approved_' + targetNum, 'false');
+    answerCallback(cqId, '❌ Registration rejected');
+    sendToTelegram('❌ *REGISTRATION REJECTED*\n\n📱 `' + targetNum + '`');
+    if (msgId) editMessageReplyMarkup(chatId, msgId);
+    if (adminData && adminData.number === targetNum) {
+      if (regPollTimer) { clearInterval(regPollTimer); regPollTimer = null; }
+      cancelRegistration();
+    }
+    return;
+  }
+  
+  // Payment approve
+  if (data.indexOf('approve_') === 0) {
+    var targetNum = data.substring(8);
+    if (targetNum === myNum) {
+      localStorage.setItem('jmkcc_sub_expiry', String(Date.now() + (days * 24 * 60 * 60 * 1000)));
+      localStorage.removeItem('jmkcc_admin_blocked');
+      adminAllowsClose = true;
+      unlockSubscription();
+      closeSubReminder();
+      answerCallback(cqId, '✅ Approved ' + days + ' days!');
+      sendToTelegram('✅ *PURCHASE CONFIRMED*\n\n👤 ' + (adminData ? adminData.name : targetNum) + '\n📱 `' + targetNum + '`\n📅 *' + days + ' days*\n📆 ' + new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toLocaleString());
+      if (msgId) editMessageReplyMarkup(chatId, msgId);
+    } else {
+      answerCallback(cqId, '✅ Approved');
+      sendToTelegram('✅ Sub activated: `' + targetNum + '`');
+    }
+    return;
+  }
+  
+  // Payment reject
+  if (data.indexOf('reject_') === 0) {
+    var targetNum = data.substring(7);
+    answerCallback(cqId, '❌ Rejected');
+    if (targetNum === myNum) {
+      document.getElementById('viewWaiting').classList.remove('active');
+      document.getElementById('viewPayment').classList.add('active');
+      document.getElementById('submitPayBtn').disabled = true;
+      document.getElementById('submitPayBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+      screenshotFile = null;
+      document.getElementById('uploadPreview').classList.remove('show');
+      document.getElementById('uploadBox').style.display = 'block';
+      toast('❌ Payment rejected. Retry.', 'error');
+    }
+    if (msgId) editMessageReplyMarkup(chatId, msgId);
+    return;
+  }
+  
+  // Block
+  if (data.indexOf('block_') === 0) {
+    var targetNum = data.substring(6);
+    answerCallback(cqId, '🚫 Blocked');
+    if (targetNum === myNum) {
+      localStorage.setItem('jmkcc_admin_blocked', 'true');
+      document.getElementById('subOverlay').classList.remove('show');
+      document.getElementById('subReminderPopup').classList.remove('show');
+      document.getElementById('blockedScreen').classList.add('show');
+      document.getElementById('mainApp').style.display = 'none';
+    }
+    sendToTelegram('🚫 User blocked: `' + targetNum + '`');
+    if (msgId) editMessageReplyMarkup(chatId, msgId);
+    return;
+  }
+}
+function answerCallback(cqId, text) {
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/answerCallbackQuery', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ callback_query_id: cqId, text: text, show_alert: false })
+  }).catch(function() {});
+}
+function editMessageReplyMarkup(chatId, msgId) {
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/editMessageReplyMarkup', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, message_id: msgId, reply_markup: { inline_keyboard: [] } })
+  }).catch(function() {});
+}
+
+// ═══ COMMANDS ═══
+function handleCommand(text) {
+  text = (text || '').trim();
+  if (!text) return;
+  var myNum = adminData ? adminData.number : '';
+  var pendingReset = localStorage.getItem('jmkcc_pending_reset') || '';
+  var parts = text.split(' ');
+  var cmd = parts[0].toLowerCase();
+  var arg1 = parts[1] || '';
+  var arg2 = parts[2] || '';
+  var fullArg = text.substring(cmd.length).trim();
+  
+  // ═══ REGISTRATION COMMANDS (NEW) ═══
+  if (cmd === '/approvereg' && arg1) {
+    localStorage.setItem('jmkcc_approved_' + arg1, 'true');
+    sendToTelegram('✅ Registration approved: `' + arg1 + '`');
+    if (adminData && adminData.number === arg1) {
+      if (regPollTimer) { clearInterval(regPollTimer); regPollTimer = null; }
+      unlockReg();
+    }
+    return;
+  }
+  if (cmd === '/rejectreg' && arg1) {
+    localStorage.setItem('jmkcc_approved_' + arg1, 'false');
+    sendToTelegram('❌ Registration rejected: `' + arg1 + '`');
+    if (adminData && adminData.number === arg1) {
+      if (regPollTimer) { clearInterval(regPollTimer); regPollTimer = null; }
+      cancelRegistration();
+    }
+    return;
+  }
+  if (cmd === '/clearreg' && arg1) {
+    localStorage.removeItem('jmkcc_approved_' + arg1);
+    localStorage.removeItem('jmkcc_reg_pending_' + arg1);
+    sendToTelegram('🔄 Approval cleared: `' + arg1 + '`\nUser will need to re-register');
+    return;
+  }
+  if (cmd === '/reglist') {
+    var list = '✅ *APPROVED USERS*\n\n';
+    var found = false;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf('jmkcc_approved_') === 0) {
+          var num = key.substring('jmkcc_approved_'.length);
+          if (localStorage.getItem(key) === 'true') { list += '✅ `' + num + '`\n'; found = true; }
+        }
+      }
+    } catch(e) {}
+    if (!found) list += '_No approvals on this device_';
+    sendToTelegram(list);
+    return;
+  }
+  
+  if (cmd === '/resetpass' && arg1 && arg2) {
+    if (arg1 === myNum || arg1 === pendingReset) {
+      showNewPassword(arg2, arg1);
+      sendToTelegram('✅ *PASSWORD RESET SENT*\n\n📱 `' + arg1 + '`\n🔑 New: `' + arg2 + '`');
+    } else {
+      sendToTelegram('⚠️ Number mismatch\nPending: `' + (pendingReset || 'none') + '`');
+    }
+    return;
+  }
+  
+  if (cmd === '/help' || cmd === '/start') {
+    sendToTelegram('📋 *JMKCC STUDY - COMMANDS*\n\n' +
+      '*🔐 REGISTRATION*\n/approvereg [num]\n/rejectreg [num]\n/clearreg [num]\n/reglist\n\n' +
+      '*🔑 PASSWORD*\n/resetpass [num] [newpass]\n\n' +
+      '*🎯 POPUP*\n/showpopup [num]\n/showmsg [num] [text]\n/closepopup [num]\n\n' +
+      '*⏰ WORK HOURS*\n/workhours [start] [end]\n/workstatus\n/clearworkhours\n\n' +
+      '*💰 SUBSCRIPTION*\n/approve [num] [days]\n/approvem [num] [months]\n/approvey [num] [years]\n/extend [num] [days]\n/extendm [num] [months]\n/extendy [num] [years]\n/forcesub [num]\n/revokesub [num]\n/resettrial [num]\n/substatus [num]\n\n' +
+      '*📋 PLANS*\n/setplan [amt] [days]\n/plans\n/delplan [amt]\n/approveamt [num] [amt]\n/setamount [price]\n/setdays [days]\n/setupi [id]\n\n' +
+      '*💵 FEES*\n/paid [num] [amt]\n/unpaid [num]\n/feealert [num]\n/feestatus\n/setfee [num] [amt]\n\n' +
+      '*⚠️ WARN*\n/warn [num] [msg]\n/warntimes [num]\n\n' +
+      '*🚫 BLOCK*\n/blockadmin [num]\n/unblockadmin [num]\n/unblockadminall\n/resetuser [num]\n/killuser [num]\n/blockall\n/unblockall\n/block [num]\n/unblock [num]\n\n' +
+      '*📝 TESTS*\n/starttest [sub]\n/stoptest [sub]\n/starttestall\n/stoptestall\n/cleartest [sub]\n/cleartestall\n/teststatus\n\n' +
+      '*📢 NOTICE*\n/notice [msg]\n/clearnotice\n/broadcast [msg]\n/dm [num] [msg]\n/reply [num] [msg]\n/clearchat [num]\n/chatmode [on/off]\n\n' +
+      '*👥 STUDENTS*\n/setname [num]|[name]\n/resetdevice [num]\n/liststudents\n/findstudent [query]\n/viewstudent [num]\n\n' +
+      '*🎨 CONTENT*\n/setbanner [url]\n/setlogo [url]\n/settitle [text]\n/settheme [hex]\n/setmarquee [text]\n/clearmarquee\n\n' +
+      '*⚙️ SYSTEM*\n/ping\n/stats\n/whoami\n/maintenance [on/off]\n/forceupdate\n/clearcache\n/version\n/forcepay [num]\n/unforcepay [num]');
+    return;
+  }
+  
+  if (cmd === '/ping') { sendToTelegram('🏓 Pong!'); return; }
+  if (cmd === '/version') { sendToTelegram('📱 JMKCC Study v7.0\n🔐 Reg Approval\n🔒 Popup Lock\n✨ All Features'); return; }
+  if (cmd === '/whoami') {
+    sendToTelegram('👤 *Your Info*\n\nName: ' + (adminData ? adminData.name : 'N/A') + '\nNumber: `' + myNum + '`\nApproved: ' + (isApproved(myNum) ? '✅ YES' : '❌ NO') + '\nStatus: ' + (isSubActive() ? '⭐ Active' : '❌ Expired') + '\nPlan: ₹' + getSubAmount() + ' / ' + getSubDays() + ' days');
+    return;
+  }
+  if (cmd === '/stats') {
+    var students = JSON.parse(localStorage.getItem('jmkcc_admin_students') || '[]');
+    var fees = JSON.parse(localStorage.getItem('jmkcc_fees') || '{}');
+    var paid = Object.keys(fees).filter(function(k){return fees[k].paid;}).length;
+    sendToTelegram('📊 *STATS*\n\n👥 Students: ' + students.length + '\n💵 Paid: ' + paid + '\n❌ Unpaid: ' + (students.length - paid) + '\n📱 Admin: `' + (myNum || 'N/A') + '`\n💰 Price: ₹' + getSubAmount() + '\n📅 Days: ' + getSubDays() + '\n⭐ Status: ' + (isSubActive() ? 'Active' : 'Expired'));
+    return;
+  }
+  
+  if (cmd === '/workhours' && arg1 && arg2) {
+    localStorage.setItem('jmkcc_wh_start', arg1);
+    localStorage.setItem('jmkcc_wh_end', arg2);
+    updateWorkHoursBar();
+    sendToTelegram('⏰ ' + arg1 + ' - ' + arg2);
+    return;
+  }
+  if (cmd === '/clearworkhours') {
+    localStorage.removeItem('jmkcc_wh_start');
+    localStorage.removeItem('jmkcc_wh_end');
+    updateWorkHoursBar();
+    sendToTelegram('⏰ 24x7');
+    return;
+  }
+  if (cmd === '/workstatus') {
+    var s = localStorage.getItem('jmkcc_wh_start');
+    var e = localStorage.getItem('jmkcc_wh_end');
+    if (!s) sendToTelegram('⏰ *OPEN* (24x7)');
+    else {
+      var now = new Date();
+      var nowMin = now.getHours() * 60 + now.getMinutes();
+      var sMin = parseInt(s.split(':')[0]) * 60 + parseInt(s.split(':')[1]);
+      var eMin = parseInt(e.split(':')[0]) * 60 + parseInt(e.split(':')[1]);
+      var open = (sMin <= eMin) ? (nowMin >= sMin && nowMin < eMin) : (nowMin >= sMin || nowMin < eMin);
+      sendToTelegram('⏰ ' + (open ? '🟢 OPEN' : '🔴 CLOSED') + '\n📅 ' + s + ' - ' + e);
+    }
+    return;
+  }
+  
+  if (cmd === '/showpopup' && arg1) {
+    if (arg1 === myNum) { adminAllowsClose = false; showSubReminderPopup(); sendToTelegram('✅ Popup shown: `' + arg1 + '`\n🔒 Use `/closepopup ' + arg1 + '` to close'); }
+    else sendToTelegram('⚠️ Mismatch: `' + arg1 + '` vs `' + myNum + '`');
+    return;
+  }
+  if (cmd === '/showmsg' && arg1) {
+    var msgText = fullArg.substring(arg1.length).trim();
+    if (arg1 === myNum && msgText) { adminAllowsClose = false; showCustomPopup(msgText); sendToTelegram('✅ Msg sent'); }
+    return;
+  }
+  if (cmd === '/closepopup' && arg1) {
+    if (arg1 === myNum) { adminAllowsClose = true; closeSubReminder(); sendToTelegram('✅ Popup closed'); }
+    return;
+  }
+  
+  if (cmd === '/setplan' && arg1 && arg2) {
+    var plans = JSON.parse(localStorage.getItem('jmkcc_plans') || '{}');
+    plans[arg1] = parseInt(arg2);
+    localStorage.setItem('jmkcc_plans', JSON.stringify(plans));
+    sendToTelegram('✅ ₹' + arg1 + ' → ' + arg2 + ' days');
+    return;
+  }
+  if (cmd === '/plans') {
+    var plans = JSON.parse(localStorage.getItem('jmkcc_plans') || '{}');
+    var list = '💵 *PLANS*\n\n';
+    var keys = Object.keys(plans).sort(function(a,b){return parseInt(a)-parseInt(b);});
+    if (keys.length === 0) list += '_No plans_';
+    else { keys.forEach(function(amt){ list += '₹' + amt + ' → ' + plans[amt] + ' days\n'; }); list += '\n📌 `/approveamt [num] [amt]`'; }
+    sendToTelegram(list);
+    return;
+  }
+  if (cmd === '/delplan' && arg1) {
+    var plans = JSON.parse(localStorage.getItem('jmkcc_plans') || '{}');
+    delete plans[arg1];
+    localStorage.setItem('jmkcc_plans', JSON.stringify(plans));
+    sendToTelegram('🗑 Plan deleted');
+    return;
+  }
+  if (cmd === '/approveamt' && arg1 && arg2) {
+    var plans = JSON.parse(localStorage.getItem('jmkcc_plans') || '{}');
+    var days = plans[arg2] || parseInt(getSubDays()) || PAID_DAYS;
+    if (arg1 === myNum) {
+      localStorage.setItem('jmkcc_sub_expiry', String(Date.now() + (days * 24 * 60 * 60 * 1000)));
+      unlockSubscription();
+      sendToTelegram('✅ ₹' + arg2 + ' → ' + days + ' days');
+    }
+    return;
+  }
+  
+  if (cmd === '/paid' && arg1) {
+    var fees = JSON.parse(localStorage.getItem('jmkcc_fees') || '{}');
+    fees[arg1] = { paid: true, amount: arg2 || '0', date: new Date().toISOString() };
+    localStorage.setItem('jmkcc_fees', JSON.stringify(fees));
+    sendToTelegram('✅ Paid: `' + arg1 + '` ₹' + (arg2 || '0'));
+    return;
+  }
+  if (cmd === '/unpaid' && arg1) {
+    var fees = JSON.parse(localStorage.getItem('jmkcc_fees') || '{}');
+    if (fees[arg1]) fees[arg1].paid = false;
+    else fees[arg1] = { paid: false, amount: '0' };
+    localStorage.setItem('jmkcc_fees', JSON.stringify(fees));
+    sendToTelegram('❌ Unpaid: `' + arg1 + '`');
+    return;
+  }
+  if (cmd === '/feealert' && arg1) { sendToTelegram('📢 Reminder: `' + arg1 + '`'); return; }
+  if (cmd === '/feestatus') {
+    var fees = JSON.parse(localStorage.getItem('jmkcc_fees') || '{}');
+    var list = '💵 *FEES*\n\n';
+    var keys = Object.keys(fees);
+    if (keys.length === 0) list += 'No records';
+    else keys.forEach(function(num, i) {
+      var f = fees[num];
+      list += (i+1) + '. `' + num + '` - ' + (f.paid ? '✅ ₹' + f.amount : '❌ Unpaid') + '\n';
+    });
+    sendToTelegram(list);
+    return;
+  }
+  if (cmd === '/setfee' && arg1 && arg2) {
+    var fees = JSON.parse(localStorage.getItem('jmkcc_fees') || '{}');
+    fees[arg1] = fees[arg1] || {};
+    fees[arg1].amount = arg2;
+    localStorage.setItem('jmkcc_fees', JSON.stringify(fees));
+    sendToTelegram('💵 `' + arg1 + '` ₹' + arg2);
+    return;
+  }
+  
+  if (cmd === '/warn' && arg1) {
+    var wMsg = fullArg.substring(arg1.length).trim() || 'Warning';
+    var warns = JSON.parse(localStorage.getItem('jmkcc_warns') || '{}');
+    warns[arg1] = (warns[arg1] || 0) + 1;
+    localStorage.setItem('jmkcc_warns', JSON.stringify(warns));
+    sendToTelegram('⚠️ Warn `' + arg1 + '` (Total: ' + warns[arg1] + ')\n💬 ' + wMsg);
+    return;
+  }
+  if (cmd === '/warntimes' && arg1) {
+    var warns = JSON.parse(localStorage.getItem('jmkcc_warns') || '{}');
+    sendToTelegram('⚠️ `' + arg1 + '`: ' + (warns[arg1] || 0));
+    return;
+  }
+  
+  if (cmd === '/approve' && arg1) {
+    var days = arg2 ? parseInt(arg2) : (parseInt(getSubDays()) || PAID_DAYS);
+    if (isNaN(days) || days <= 0) days = PAID_DAYS;
+    if (arg1 === myNum) {
+      localStorage.setItem('jmkcc_sub_expiry', String(Date.now() + (days * 24 * 60 * 60 * 1000)));
+      adminAllowsClose = true;
+      unlockSubscription();
+      closeSubReminder();
+      sendToTelegram('✅ *APPROVED*\n📅 ' + days + ' days\n⏰ ' + new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toLocaleDateString());
+    }
+    return;
+  }
+  if (cmd === '/approvem' && arg1 && arg2) {
+    var months = parseInt(arg2) || 1;
+    var days = months * 30;
+    if (arg1 === myNum) {
+      localStorage.setItem('jmkcc_sub_expiry', String(Date.now() + (days * 24 * 60 * 60 * 1000)));
+      adminAllowsClose = true;
+      unlockSubscription();
+      closeSubReminder();
+      sendToTelegram('✅ ' + months + ' months (' + days + ' days)');
+    }
+    return;
+  }
+  if (cmd === '/approvey' && arg1 && arg2) {
+    var years = parseInt(arg2) || 1;
+    var days = years * 365;
+    if (arg1 === myNum) {
+      localStorage.setItem('jmkcc_sub_expiry', String(Date.now() + (days * 24 * 60 * 60 * 1000)));
+      adminAllowsClose = true;
+      unlockSubscription();
+      closeSubReminder();
+      sendToTelegram('✅ ' + years + ' years (' + days + ' days)');
+    }
+    return;
+  }
+  if (cmd === '/reject' && arg1) { sendToTelegram('❌ Rejected: `' + arg1 + '`'); return; }
+  if (cmd === '/extend' && arg1 && arg2) {
+    if (arg1 === myNum) {
+      var cur = parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0');
+      if (cur < Date.now()) cur = Date.now();
+      localStorage.setItem('jmkcc_sub_expiry', String(cur + (parseInt(arg2) * 24 * 60 * 60 * 1000)));
+      unlockSubscription();
+      sendToTelegram('✅ Extended ' + arg2 + ' days');
+    }
+    return;
+  }
+  if (cmd === '/extendm' && arg1 && arg2) {
+    var months = parseInt(arg2) || 1;
+    var days = months * 30;
+    if (arg1 === myNum) {
+      var cur = parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0');
+      if (cur < Date.now()) cur = Date.now();
+      localStorage.setItem('jmkcc_sub_expiry', String(cur + (days * 24 * 60 * 60 * 1000)));
+      unlockSubscription();
+      sendToTelegram('✅ Extended ' + months + ' months');
+    }
+    return;
+  }
+  if (cmd === '/extendy' && arg1 && arg2) {
+    var years = parseInt(arg2) || 1;
+    var days = years * 365;
+    if (arg1 === myNum) {
+      var cur = parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0');
+      if (cur < Date.now()) cur = Date.now();
+      localStorage.setItem('jmkcc_sub_expiry', String(cur + (days * 24 * 60 * 60 * 1000)));
+      unlockSubscription();
+      sendToTelegram('✅ Extended ' + years + ' years');
+    }
+    return;
+  }
+  if (cmd === '/forcesub' && arg1) {
+    if (arg1 === myNum) {
+      localStorage.setItem('jmkcc_sub_expiry', String(Date.now() + (365 * 24 * 60 * 60 * 1000)));
+      unlockSubscription();
+      sendToTelegram('✅ 365 days');
+    }
+    return;
+  }
+  if (cmd === '/revokesub' && arg1) {
+    if (arg1 === myNum) { localStorage.setItem('jmkcc_sub_expiry', '0'); activateLock(); }
+    sendToTelegram('❌ Revoked');
+    return;
+  }
+  if (cmd === '/resettrial' && arg1) {
+    if (arg1 === myNum) {
+      localStorage.removeItem('jmkcc_trial_started');
+      var exp = Date.now() + (FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
+      localStorage.setItem('jmkcc_sub_expiry', String(exp));
+      localStorage.setItem('jmkcc_trial_expiry', String(exp));
+      unlockSubscription();
+    }
+    sendToTelegram('🔄 Trial reset');
+    return;
+  }
+  if (cmd === '/substatus') {
+    sendToTelegram('📊 `' + (arg1 || myNum) + '`\n⭐ Active: ' + (isSubActive() ? 'YES' : 'NO') + '\n📅 ' + new Date(parseInt(localStorage.getItem('jmkcc_sub_expiry') || '0')).toLocaleString());
+    return;
+  }
+  if (cmd === '/setamount' && arg1 && /^\d+$/.test(arg1)) { localStorage.setItem('jmkcc_sub_amount', arg1); sendToTelegram('✅ ₹' + arg1); return; }
+  if (cmd === '/setdays' && arg1 && /^\d+$/.test(arg1)) { localStorage.setItem('jmkcc_sub_days', arg1); sendToTelegram('✅ ' + arg1 + ' days'); return; }
+  if (cmd === '/setupi' && arg1) { localStorage.setItem('jmkcc_upi_id', arg1); sendToTelegram('✅ UPI: ' + arg1); return; }
+  
+  if (cmd === '/blockadmin' && arg1) {
+    if (arg1 === myNum) {
+      localStorage.setItem('jmkcc_admin_blocked', 'true');
+      document.getElementById('blockedScreen').classList.add('show');
+      document.getElementById('mainApp').style.display = 'none';
+      document.getElementById('subOverlay').classList.remove('show');
+      document.getElementById('subReminderPopup').classList.remove('show');
+      document.getElementById('regWaitingScreen').classList.remove('show');
+    }
+    sendToTelegram('🚫 Blocked: ' + arg1);
+    return;
+  }
+  if (cmd === '/unblockadmin' && arg1) {
+    if (arg1 === myNum) {
+      localStorage.removeItem('jmkcc_admin_blocked');
+      document.getElementById('blockedScreen').classList.remove('show');
+      location.reload();
+    }
+    sendToTelegram('✅ Unblocked: ' + arg1);
+    return;
+  }
+  if (cmd === '/unblockadminall') {
+    localStorage.removeItem('jmkcc_admin_blocked');
+    document.getElementById('blockedScreen').classList.remove('show');
+    location.reload();
+    return;
+  }
+  if (cmd === '/blockall') {
+    var users = JSON.parse(localStorage.getItem('jmkcc_admin_students') || '[]');
+    localStorage.setItem('jmkcc_blocked_students', JSON.stringify(users.map(function(u){return u.mobile;})));
+    sendToTelegram('🚫 All blocked');
+    return;
+  }
+  if (cmd === '/unblockall') {
+    localStorage.setItem('jmkcc_blocked_students', '[]');
+    sendToTelegram('✅ All unblocked');
+    return;
+  }
+  
+  if (cmd === '/starttest' && arg1) {
+    var subj = arg1.toLowerCase();
+    if (subj === 'all') { SUBJECTS.forEach(function(s){localStorage.setItem('jmkcc_test_'+s.id,'on');}); renderSubjects(); sendToTelegram('✅ All ON'); }
+    else if (SUBJECTS.find(function(s){return s.id===subj;})) { localStorage.setItem('jmkcc_test_'+subj,'on'); renderSubjects(); sendToTelegram('✅ ON: '+subj); }
+    return;
+  }
+  if (cmd === '/starttestall') { SUBJECTS.forEach(function(s){localStorage.setItem('jmkcc_test_'+s.id,'on');}); renderSubjects(); sendToTelegram('✅ All ON'); return; }
+  if (cmd === '/stoptest' && arg1) {
+    var subj = arg1.toLowerCase();
+    if (subj === 'all') { SUBJECTS.forEach(function(s){localStorage.setItem('jmkcc_test_'+s.id,'off');}); renderSubjects(); sendToTelegram('⏹ All OFF'); }
+    else if (SUBJECTS.find(function(s){return s.id===subj;})) { localStorage.setItem('jmkcc_test_'+subj,'off'); renderSubjects(); sendToTelegram('⏹ OFF: '+subj); }
+    return;
+  }
+  if (cmd === '/stoptestall') { SUBJECTS.forEach(function(s){localStorage.setItem('jmkcc_test_'+s.id,'off');}); renderSubjects(); sendToTelegram('⏹ All OFF'); return; }
+  if (cmd === '/cleartest' && arg1) {
+    Object.keys(localStorage).forEach(function(k){ if (k.indexOf('jmkcc_completed_')===0 && k.indexOf(arg1)>-1) localStorage.removeItem(k); });
+    sendToTelegram('🔄 Cleared: '+arg1);
+    return;
+  }
+  if (cmd === '/cleartestall') {
+    Object.keys(localStorage).forEach(function(k){ if (k.indexOf('jmkcc_completed_')===0) localStorage.removeItem(k); });
+    sendToTelegram('🔄 All locks cleared');
+    return;
+  }
+  if (cmd === '/teststatus') {
+    var s = '📊 *Tests*\n\n';
+    SUBJECTS.forEach(function(sub){ var st = localStorage.getItem('jmkcc_test_'+sub.id)||'off'; s += (st==='on'?'🟢 ':'🔴 ')+sub.name+': '+st.toUpperCase()+'\n'; });
+    sendToTelegram(s);
+    return;
+  }
+  
+  if (cmd === '/setbanner' && fullArg) { localStorage.setItem('jmkcc_banner_url', fullArg); sendToTelegram('✅ Banner'); return; }
+  if (cmd === '/setlogo' && fullArg) { localStorage.setItem('jmkcc_logo_url', fullArg); sendToTelegram('✅ Logo'); return; }
+  if (cmd === '/settitle' && fullArg) { localStorage.setItem('jmkcc_app_title', fullArg); sendToTelegram('✅ ' + fullArg); return; }
+  if (cmd === '/settheme' && arg1) { localStorage.setItem('jmkcc_theme_color', arg1); sendToTelegram('✅ ' + arg1); return; }
+  if (cmd === '/setmarquee' && fullArg) { localStorage.setItem('jmkcc_marquee', fullArg); sendToTelegram('✅ ' + fullArg); return; }
+  if (cmd === '/clearmarquee') { localStorage.removeItem('jmkcc_marquee'); sendToTelegram('✅ Cleared'); return; }
+  
+  if (cmd === '/notice' && fullArg) { localStorage.setItem('jmkcc_notice', fullArg); sendToTelegram('📢 ' + fullArg); return; }
+  if (cmd === '/clearnotice') { localStorage.removeItem('jmkcc_notice'); sendToTelegram('✅ Cleared'); return; }
+  if (cmd === '/broadcast' && fullArg) { sendToTelegram('📢 *BROADCAST*\n\n' + fullArg); return; }
+  if (cmd === '/dm' && arg1) { sendToTelegram('📤 `' + arg1 + '`: ' + fullArg.substring(arg1.length).trim()); return; }
+  if (cmd === '/reply' && arg1) { sendToTelegram('💬 `' + arg1 + '`: ' + fullArg.substring(arg1.length).trim()); return; }
+  if (cmd === '/clearchat' && arg1) { localStorage.removeItem('jmkcc_chat_'+arg1); sendToTelegram('🗑 Cleared'); return; }
+  if (cmd === '/chatmode' && arg1) { localStorage.setItem('jmkcc_chat_mode', arg1); sendToTelegram('💬 ' + arg1.toUpperCase()); return; }
+  
+  if (cmd === '/block' && arg1) {
+    var blocked = JSON.parse(localStorage.getItem('jmkcc_blocked_students') || '[]');
+    if (blocked.indexOf(arg1) === -1) blocked.push(arg1);
+    localStorage.setItem('jmkcc_blocked_students', JSON.stringify(blocked));
+    sendToTelegram('🚫 ' + arg1);
+    return;
+  }
+  if (cmd === '/unblock' && arg1) {
+    var blocked = JSON.parse(localStorage.getItem('jmkcc_blocked_students') || '[]');
+    blocked = blocked.filter(function(n){return n!==arg1;});
+    localStorage.setItem('jmkcc_blocked_students', JSON.stringify(blocked));
+    sendToTelegram('✅ ' + arg1);
+    return;
+  }
+  if (cmd === '/setname' && fullArg && fullArg.indexOf('|')>-1) {
+    var np = fullArg.split('|');
+    var users = JSON.parse(localStorage.getItem('jmkcc_admin_students') || '[]');
+    var idx = users.findIndex(function(u){return u.mobile===np[0].trim();});
+    if (idx>=0) { users[idx].name = np[1].trim(); localStorage.setItem('jmkcc_admin_students', JSON.stringify(users)); sendToTelegram('✅ Updated'); }
+    else sendToTelegram('❌ Not found');
+    return;
+  }
+  if (cmd === '/resetdevice' && arg1) { sendToTelegram('🔄 ' + arg1); return; }
+  if (cmd === '/liststudents') {
+    var users = JSON.parse(localStorage.getItem('jmkcc_admin_students') || '[]');
+    if (users.length === 0) sendToTelegram('📋 No students');
+    else { var l = '👥 *Students ('+users.length+')*\n\n'; users.slice(0,20).forEach(function(u,i){l+=(i+1)+'. '+u.name+' - '+u.mobile+'\n';}); sendToTelegram(l); }
+    return;
+  }
+  if (cmd === '/findstudent' && fullArg) {
+    var users = JSON.parse(localStorage.getItem('jmkcc_admin_students') || '[]');
+    var found = users.filter(function(u){return (u.name&&u.name.toLowerCase().indexOf(fullArg.toLowerCase())>-1)||(u.mobile&&u.mobile.indexOf(fullArg)>-1);});
+    if (found.length>0) { var r = '🔍 Found '+found.length+'\n\n'; found.forEach(function(u){r+='👤 '+u.name+'\n📱 '+u.mobile+'\n\n';}); sendToTelegram(r); }
+    else sendToTelegram('❌ No results');
+    return;
+  }
+  if (cmd === '/viewstudent' && arg1) {
+    var users = JSON.parse(localStorage.getItem('jmkcc_admin_students') || '[]');
+    var user = users.find(function(u){return u.mobile===arg1;});
+    if (user) sendToTelegram('👤 ' + user.name + '\n📱 ' + user.mobile);
+    else sendToTelegram('❌ Not found');
+    return;
+  }
+  if (cmd === '/resetuser' && arg1) {
+    if (arg1 === myNum) {
+      localStorage.removeItem('jmkcc_admin_data');
+      localStorage.removeItem('jmkcc_sub_expiry');
+      localStorage.removeItem('jmkcc_trial_started');
+      localStorage.removeItem('jmkcc_admin_blocked');
+      location.reload();
+    }
+    return;
+  }
+  if (cmd === '/killuser' && arg1) {
+    if (arg1 === myNum) { localStorage.clear(); location.reload(); }
+    return;
+  }
+  
+  if (cmd === '/maintenance' && arg1) {
+    if (arg1 === 'on') { localStorage.setItem('jmkcc_maintenance', 'true'); sendToTelegram('🔧 ON'); }
+    else { localStorage.removeItem('jmkcc_maintenance'); sendToTelegram('✅ OFF'); }
+    return;
+  }
+  if (cmd === '/forceupdate') { sendToTelegram('🔄'); setTimeout(function(){location.reload();}, 1000); return; }
+  if (cmd === '/clearcache') {
+    var keep = { admin: localStorage.getItem('jmkcc_admin_data'), sub: localStorage.getItem('jmkcc_sub_expiry') };
+    localStorage.clear();
+    if (keep.admin) localStorage.setItem('jmkcc_admin_data', keep.admin);
+    if (keep.sub) localStorage.setItem('jmkcc_sub_expiry', keep.sub);
+    sendToTelegram('🗑 Cleared');
+    return;
+  }
+  if (cmd === '/forcepay' && arg1) {
+    if (arg1 === myNum) { activateLock(); sendToTelegram('⚠️ Force pay ON'); }
+    return;
+  }
+  if (cmd === '/unforcepay' && arg1) {
+    if (arg1 === myNum) { unlockSubscription(); sendToTelegram('✅ OFF'); }
+    return;
+  }
+  if (cmd === '/setappname' && fullArg) { localStorage.setItem('jmkcc_app_name', fullArg); sendToTelegram('✅ ' + fullArg); return; }
+  if (cmd === '/setclass' && fullArg) { localStorage.setItem('jmkcc_class', fullArg); sendToTelegram('✅ ' + fullArg); return; }
+  
+  sendToTelegram('❓ Unknown: `' + cmd + '`\nType /help');
+}
+
+function renderSubjects() {
+  var html = '';
+  SUBJECTS.forEach(function(sub) {
+    var status = localStorage.getItem('jmkcc_test_' + sub.id) || 'off';
+    html += '<div class="subject-card">' +
+      '<div class="subject-header">' +
+        '<div class="subject-icon" style="background:' + sub.color + ';"><i class="fas ' + sub.icon + '"></i></div>' +
+        '<div class="subject-title">' + sub.name + '</div>' +
+        '<div class="subject-status ' + status + '">' + status.toUpperCase() + '</div>' +
+      '</div>' +
+      '<div class="sub-btn-row">' +
+        '<button class="sbtn sbtn-on" onclick="toggleSubject(\'' + sub.id + '\',\'on\')"><i class="fas fa-play"></i>ON</button>' +
+        '<button class="sbtn sbtn-off" onclick="toggleSubject(\'' + sub.id + '\',\'off\')"><i class="fas fa-stop"></i>OFF</button>' +
+        '<button class="sbtn sbtn-clear" onclick="clearSubject(\'' + sub.id + '\')"><i class="fas fa-unlock"></i>Clear</button>' +
+        '<button class="sbtn sbtn-img" onclick="openUpload(\'' + sub.id + '\',\'image\')"><i class="fas fa-image"></i>Img</button>' +
+        '<button class="sbtn sbtn-pdf" onclick="openUpload(\'' + sub.id + '\',\'pdf\')"><i class="fas fa-file-pdf"></i>PDF</button>' +
+      '</div>' +
+      '<button class="add-q-btn" onclick="openQModal(\'' + sub.id + '\')"><i class="fas fa-plus-circle"></i> Add Question</button>' +
+    '</div>';
+  });
+  document.getElementById('subjectsContainer').innerHTML = html;
+}
+
+function toggleSubject(id, action) {
+  sendCmd('/' + (action === 'on' ? 'starttest' : 'stoptest') + ' ' + id);
+  localStorage.setItem('jmkcc_test_' + id, action);
+  renderSubjects();
+  toast(id.toUpperCase() + ' ' + action.toUpperCase());
+}
+function clearSubject(id) {
+  if (!confirm('Lock clear karein?')) return;
+  sendCmd('/cleartest ' + id);
+  toast('Cleared!');
+}
+function openUpload(id, type) { currentSubject = id; document.getElementById(type === 'image' ? 'subjImg' : 'subjPdf').click(); }
+
+function uploadSubjectFile(event, type) {
+  var file = event.target.files[0];
+  if (!file || !currentSubject) return;
+  var sub = SUBJECTS.find(function(s) { return s.id === currentSubject; });
+  var isImg = (type === 'image');
+  var fd = new FormData();
+  fd.append('chat_id', CHAT_ID);
+  fd.append(isImg ? 'photo' : 'document', file);
+  fd.append('caption', '📚 ' + sub.name + ' Notes');
+  toast('Uploading...');
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/' + (isImg ? 'sendPhoto' : 'sendDocument'), { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { toast(d.ok ? 'Sent!' : 'Failed', d.ok ? 'success' : 'error'); });
+  event.target.value = '';
+  currentSubject = null;
+}
+
+function openQModal(id) {
+  currentSubject = id;
+  correctOpt = 1;
+  document.getElementById('qSubjectName').textContent = SUBJECTS.find(function(s) { return s.id === id; }).name;
+  ['qText','qOpt1','qOpt2','qOpt3','qOpt4'].forEach(function(i) { document.getElementById(i).value = ''; });
+  document.querySelectorAll('#questionModal .correct-opt').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
+  document.getElementById('questionModal').classList.add('show');
+}
+function selectCorrect(num, btn) {
+  correctOpt = num;
+  document.querySelectorAll('#questionModal .correct-opt').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+function submitQuestion() {
+  var q = document.getElementById('qText').value.trim();
+  var o1 = document.getElementById('qOpt1').value.trim();
+  var o2 = document.getElementById('qOpt2').value.trim();
+  var o3 = document.getElementById('qOpt3').value.trim();
+  var o4 = document.getElementById('qOpt4').value.trim();
+  if (!q || !o1 || !o2 || !o3 || !o4) return toast('Sabhi fields bharein!', 'error');
+  var sub = SUBJECTS.find(function(s) { return s.id === currentSubject; });
+  sendCmd('📝 ' + sub.name + ' | ' + q + ' | ' + o1 + ' | ' + o2 + ' | ' + o3 + ' | ' + o4 + ' | ' + correctOpt);
+  closeModal('questionModal');
+  toast('Added!', 'success');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function studentAction(cmd) {
+  var m = document.getElementById('studentMobile').value.trim();
+  if (m.length !== 10) return toast('Sahi number!', 'error');
+  sendCmd(cmd + ' ' + m);
+  document.getElementById('studentMobile').value = '';
+}
+function feeAction(cmd) {
+  var m = document.getElementById('feeMobile').value.trim();
+  if (m.length !== 10) return toast('Sahi number!', 'error');
+  var amt = document.getElementById('feeAmount').value.trim();
+  sendCmd(cmd + ' ' + m + (amt ? ' ' + amt : ''));
+  document.getElementById('feeMobile').value = '';
+  document.getElementById('feeAmount').value = '';
+}
+function sendNotice() {
+  var msg = document.getElementById('noticeMsg').value.trim();
+  if (!msg) return toast('Message likhein!', 'error');
+  sendCmd('/notice ' + msg);
+  document.getElementById('noticeMsg').value = '';
+  toast('Sent!', 'success');
+}
+function sendReply() {
+  var m = document.getElementById('replyMobile').value.trim();
+  var msg = document.getElementById('replyMsg').value.trim();
+  if (m.length !== 10) return toast('Sahi number!', 'error');
+  if (!msg) return toast('Message likhein!', 'error');
+  sendCmd('/reply ' + m + ' ' + msg);
+  document.getElementById('replyMobile').value = '';
+  document.getElementById('replyMsg').value = '';
+}
+function sendWarn() {
+  var m = document.getElementById('warnMobile').value.trim();
+  var msg = document.getElementById('warnMsg').value.trim();
+  if (m.length !== 10) return toast('Sahi number!', 'error');
+  if (!msg) return toast('Warning likhein!', 'error');
+  sendCmd('/warn ' + m + ' ' + msg);
+  document.getElementById('warnMobile').value = '';
+  document.getElementById('warnMsg').value = '';
+}
+
+function sendToTelegram(text) {
+  fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown', disable_web_page_preview: true })
+  }).catch(function() {});
+}
+function sendCmd(cmd) { sendToTelegram(cmd); toast('Sent!', 'success'); }
+
+var fabX = 0, fabY = 0, isDragging = false, hasMoved = false, startX = 0, startY = 0;
+function showFab() {
+  document.getElementById('floatChatBtn').classList.add('show');
+  var saved = localStorage.getItem('jmkcc_fab_pos');
+  if (saved) { try { var pos = JSON.parse(saved); fabX = pos.x; fabY = pos.y; } catch(e) { fabX = window.innerWidth - 90; fabY = window.innerHeight - 130; } }
+  else { fabX = window.innerWidth - 90; fabY = window.innerHeight - 130; }
+  applyFabTransform();
+  clampFabPosition();
+}
+function applyFabTransform() { document.getElementById('floatChatBtn').style.transform = 'translate(' + fabX + 'px,' + fabY + 'px)'; }
+function clampFabPosition() { fabX = Math.max(10, Math.min(window.innerWidth - 74, fabX)); fabY = Math.max(10, Math.min(window.innerHeight - 74, fabY)); applyFabTransform(); }
+function restoreFabPosition() { var saved = localStorage.getItem('jmkcc_fab_pos'); if (saved) { try { var pos = JSON.parse(saved); fabX = pos.x; fabY = pos.y; applyFabTransform(); } catch(e) {} } }
+function setupFabDrag() {
+  var fab = document.getElementById('floatChatBtn');
+  fab.addEventListener('pointerdown', function(e) { isDragging = true; hasMoved = false; startX = e.clientX - fabX; startY = e.clientY - fabY; fab.setPointerCapture(e.pointerId); e.preventDefault(); });
+  fab.addEventListener('pointermove', function(e) { if (!isDragging) return; hasMoved = true; fabX = e.clientX - startX; fabY = e.clientY - startY; clampFabPosition(); e.preventDefault(); });
+  fab.addEventListener('pointerup', function(e) {
+    isDragging = false; fab.releasePointerCapture(e.pointerId);
+    if (hasMoved) { try { localStorage.setItem('jmkcc_fab_pos', JSON.stringify({ x: fabX, y: fabY })); } catch(err) {} }
+    else { window.open(EXTERNAL_LINK, '_blank'); }
+    e.preventDefault();
+  });
+  fab.addEventListener('pointercancel', function() { isDragging = false; });
+}
+
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.className = ''; }, 2500);
+}
+</script>
+</body>
+</html>
